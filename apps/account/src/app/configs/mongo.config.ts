@@ -10,6 +10,7 @@ export const getMongoConfig = (): MongooseModuleAsyncOptions => {
     imports: [ConfigModule]
   };
 };
+
 const getMongoString = (configService: ConfigService) =>
   'mongodb://' +
   configService.get('MONGO_LOGIN') +
