@@ -1,4 +1,4 @@
-import { IUser, IUserCourses, UserRole } from '@purple/interfaces';
+import { IUser, IUserCourses, PurchaseState, UserRole } from '@purple/interfaces';
 import { compare, genSalt, hash } from 'bcryptjs';
 
 export class UserEntity implements IUser {
@@ -15,6 +15,30 @@ export class UserEntity implements IUser {
     this.displayName = user.displayName;
     this.email = user.email;
     this.role = user.role;
+    this.courses = user.courses;
+  }
+
+  public setCourseStatus(courseId: string, state: PurchaseState) {
+    const exist = this.courses.find((course) => course._id === courseId);
+    if (!exist) {
+      this.courses.push({ courseId, purchaseState: state });
+      return this;
+    }
+    if (state === PurchaseState.Canceled) {
+      this.courses = this.courses.filter((course) => course._id !== courseId);
+      return this;
+    }
+
+    this.courses = this.courses.map((course) => {
+      if (course._id === courseId) {
+        course.purchaseState = state;
+        return course;
+      }
+
+      return course;
+    });
+
+    return this;
   }
 
   public getPublicProfile() {
