@@ -1,6 +1,6 @@
 import { IsEmail, IsString } from 'class-validator';
 
-export const AccountLoginTopic = 'account.login.command';
+export const ACCOUNT_LOGIN_TOPIC = 'account.login.command';
 
 export class AccountLoginRequest {
   @IsEmail()

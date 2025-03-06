@@ -3,10 +3,10 @@ import { AuthService } from './auth.service';
 import {
   AccountLoginRequest,
   AccountLoginResponse,
-  AccountLoginTopic,
+  ACCOUNT_LOGIN_TOPIC,
   AccountRegisterRequest,
   AccountRegisterResponse,
-  AccountRegisterTopic
+  ACCOUNT_REGISTER_TOPIC
 } from '@purple/contracts';
 import { RMQRoute, RMQValidate } from 'nestjs-rmq';
 
@@ -18,13 +18,13 @@ export class AuthController {
   }
 
   @RMQValidate()
-  @RMQRoute(AccountRegisterTopic)
+  @RMQRoute(ACCOUNT_REGISTER_TOPIC)
   async register(@Body() dto: AccountRegisterRequest): Promise<AccountRegisterResponse> {
     return this.authService.register(dto);
   }
 
   @RMQValidate()
-  @RMQRoute(AccountLoginTopic)
+  @RMQRoute(ACCOUNT_LOGIN_TOPIC)
   async login(@Body() { email, password }: AccountLoginRequest): Promise<AccountLoginResponse> {
     const { id } = await this.authService.validateUser(email, password);
     return this.authService.login(id);

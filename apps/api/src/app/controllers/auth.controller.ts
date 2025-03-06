@@ -2,10 +2,10 @@ import { Body, Controller, Post, UnauthorizedException } from '@nestjs/common';
 import {
   AccountLoginRequest,
   AccountLoginResponse,
-  AccountLoginTopic,
+  ACCOUNT_LOGIN_TOPIC,
   AccountRegisterRequest,
   AccountRegisterResponse,
-  AccountRegisterTopic
+  ACCOUNT_REGISTER_TOPIC
 } from '@purple/contracts';
 import { RMQService } from 'nestjs-rmq';
 import { LoginDto } from '../dtos/login.dto';
@@ -20,7 +20,7 @@ export class AuthController {
   @Post('register')
   async register(@Body() dto: RegisterDto) {
     try {
-      return await this.rmqService.send<AccountRegisterRequest, AccountRegisterResponse>(AccountRegisterTopic, dto);
+      return await this.rmqService.send<AccountRegisterRequest, AccountRegisterResponse>(ACCOUNT_REGISTER_TOPIC, dto);
     } catch (e) {
       if (e instanceof Error) {
         throw new UnauthorizedException(e.message);
@@ -31,7 +31,7 @@ export class AuthController {
   @Post('login')
   async login(@Body() dto: LoginDto) {
     try {
-      return await this.rmqService.send<AccountLoginRequest, AccountLoginResponse>(AccountLoginTopic, dto);
+      return await this.rmqService.send<AccountLoginRequest, AccountLoginResponse>(ACCOUNT_LOGIN_TOPIC, dto);
     } catch (e) {
       if (e instanceof Error) {
         throw new UnauthorizedException(e.message);
