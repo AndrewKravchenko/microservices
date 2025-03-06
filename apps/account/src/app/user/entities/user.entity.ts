@@ -1,5 +1,6 @@
-import { IUser, IUserCourses, PurchaseState, UserRole } from '@purple/interfaces';
+import { IDomainEvent, IUser, IUserCourses, PurchaseState, UserRole } from '@purple/interfaces';
 import { compare, genSalt, hash } from 'bcryptjs';
+import { ACCOUNT_CHANGED_COURSE_TOPIC } from '@purple/contracts';
 
 export class UserEntity implements IUser {
   _id?: string;
@@ -7,6 +8,7 @@ export class UserEntity implements IUser {
   email: string;
   passwordHash: string;
   role: UserRole;
+  events: IDomainEvent[] = [];
   courses?: IUserCourses[];
 
   constructor(user: IUser) {
@@ -19,23 +21,28 @@ export class UserEntity implements IUser {
   }
 
   public setCourseStatus(courseId: string, state: PurchaseState) {
-    const exist = this.courses.find((course) => course._id === courseId);
+    const exist = this.courses.find((course) => course.courseId === courseId);
     if (!exist) {
       this.courses.push({ courseId, purchaseState: state });
       return this;
     }
     if (state === PurchaseState.Canceled) {
-      this.courses = this.courses.filter((course) => course._id !== courseId);
+      this.courses = this.courses.filter((course) => course.courseId !== courseId);
       return this;
     }
 
     this.courses = this.courses.map((course) => {
-      if (course._id === courseId) {
+      if (course.courseId === courseId) {
         course.purchaseState = state;
         return course;
       }
 
       return course;
+    });
+
+    this.events.push({
+      topic: ACCOUNT_CHANGED_COURSE_TOPIC,
+      data: { courseId, userId: this._id, state }
     });
 
     return this;
